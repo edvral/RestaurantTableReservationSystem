@@ -1,13 +1,14 @@
 # Projekto uždavinys
 
-1. **Projekto pavadinimas**  
-   Restoranų staliukų rezervavimo sistema
+1. **Projekto pavadinimas**
+   
+   Restoranų staliukų rezervacijos sistema
 
-2. **Sprendžiamo uždavinio aprašymas**
+3. **Sprendžiamo uždavinio aprašymas**
 
    ### 2.1. Sistemos paskirtis
-
-   Sistema skirta, kad naudotojai galėtų peržiūrėti informaciją apie įvarius esančius restoranus, ten esančius staliukus bei juos užsirezervuoti, įvedus reikiamą rezervacijos informaciją.
+   
+   Sistema skirta naudotojams peržiūrėti įvairių restoranų informaciją, juose esančių staliukų informaciją bei pagal poreikį juos užsirezervuoti, suvedus reikiamą rezervacijos informaciją. 
 
    ### 2.2. Funkciniai reikalavimai
 
@@ -34,7 +35,7 @@
 
    #### 2.2.4 Autentifikacija ir autorizacija
 
-3. **Pasirinktų technologijų aprašymas**
+5. **Pasirinktų technologijų aprašymas**
    - **Backend**: C# .NET 8.0
    - **Frontend**: Vue.js
    - **Database**: MySQL
