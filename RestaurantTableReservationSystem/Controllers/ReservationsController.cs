@@ -31,7 +31,7 @@ namespace RestaurantTableReservationSystem.Controllers
             return Ok(reservations);
         }
 
-        // GET: api/reservations/{id}
+        // GET: api/tables/{tableId}/reservations/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Reservation>> GetReservation(int tableId, int id)
         {
@@ -77,7 +77,7 @@ namespace RestaurantTableReservationSystem.Controllers
             return CreatedAtAction("GetReservation", new { tableId = tableId, id = reservation.ReservationId }, reservation);
         }
 
-        // PUT: api/reservations/{id}
+        // PUT: api/tables/{tableId}/reservations/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> PutReservation(int tableId, int id, ReservationDTO reservationUpdateDTO)
         {
@@ -107,7 +107,7 @@ namespace RestaurantTableReservationSystem.Controllers
             return NoContent();
         }
 
-        // DELETE: api/reservations/{id}
+        // DELETE: api/tables/{tableId}/reservations/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteReservation(int tableId, int id)
         {

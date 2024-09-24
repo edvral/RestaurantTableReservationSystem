@@ -7,7 +7,7 @@ using RestaurantTableReservationSystem.DTOs;
 namespace RestaurantTableReservationSystem.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/restaurants")]
     public class RestaurantsController : ControllerBase
     {
         private readonly RestaurantReservationContext _context;
