@@ -52,14 +52,35 @@ namespace RestaurantTableReservationSystem.Controllers
 
         // POST: api/tables/{tableId}/reservations
         [HttpPost]
-        public async Task<ActionResult<Reservation>> PostReservation(int tableId, ReservationDTO reservationCreateDTO)
+        public async Task<ActionResult<ReservationResponseDTO>> PostReservation(int tableId, ReservationDTO reservationCreateDTO)
         {
-            var tableExists = await _context.Tables.AnyAsync(t => t.TableId == tableId);
-            if (!tableExists)
+            var table = await _context.Tables.FindAsync(tableId);
+            if (table == null)
             {
                 return NotFound($"Table with ID {tableId} not found.");
             }
-          
+      
+            if (reservationCreateDTO.NumberOfGuests < 1)
+            {
+                return UnprocessableEntity("Number of guests must be at least 1.");
+            }
+
+            if (reservationCreateDTO.NumberOfGuests > table.Capacity)
+            {
+                return UnprocessableEntity($"Number of guests cannot exceed the table's capacity of {table.Capacity}.");
+            }
+
+            DateTime now = DateTime.Now;
+            if (reservationCreateDTO.ReservationStart < now)
+            {
+                return UnprocessableEntity("Reservation start time cannot be in the past.");
+            }
+
+            if (reservationCreateDTO.ReservationEnd <= reservationCreateDTO.ReservationStart)
+            {
+                return UnprocessableEntity("Reservation end time must be after the start time.");
+            }
+
             var reservation = new Reservation
             {
                 TableId = tableId,
@@ -74,15 +95,26 @@ namespace RestaurantTableReservationSystem.Controllers
             _context.Reservations.Add(reservation);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetReservation", new { tableId = tableId, id = reservation.ReservationId }, reservation);
+            var reservationResponseDTO = new ReservationResponseDTO
+            {
+                ReservationId = reservation.ReservationId,
+                GuestName = reservation.GuestName,
+                GuestPhoneNumber = reservation.GuestPhoneNumber,
+                ReservationStart = reservation.ReservationStart,
+                ReservationEnd = reservation.ReservationEnd,
+                NumberOfGuests = reservation.NumberOfGuests,
+                SpecialRequests = reservation.SpecialRequests
+            };
+
+            return CreatedAtAction("GetReservation", new { tableId = tableId, id = reservation.ReservationId }, reservationResponseDTO);
         }
 
         // PUT: api/tables/{tableId}/reservations/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> PutReservation(int tableId, int id, ReservationDTO reservationUpdateDTO)
         {
-            var tableExists = await _context.Tables.AnyAsync(t => t.TableId == tableId);
-            if (!tableExists)
+            var table = await _context.Tables.FindAsync(tableId);
+            if (table == null)
             {
                 return NotFound($"Table with ID {tableId} not found.");
             }
@@ -91,6 +123,28 @@ namespace RestaurantTableReservationSystem.Controllers
             if (reservation == null)
             {
                 return NotFound($"Reservation with ID {id} not found for table with ID {tableId}.");
+            }
+
+            if (reservationUpdateDTO.NumberOfGuests < 1)
+            {
+                return UnprocessableEntity("Number of guests must be at least 1.");
+            }
+
+            if (reservationUpdateDTO.NumberOfGuests > table.Capacity)
+            {
+                return UnprocessableEntity($"Number of guests cannot exceed the table's capacity of {table.Capacity}.");
+            }
+
+            DateTime now = DateTime.Now;
+
+            if (reservationUpdateDTO.ReservationStart < now)
+            {
+                return UnprocessableEntity("Reservation start time cannot be in the past.");
+            }
+
+            if (reservationUpdateDTO.ReservationEnd <= reservationUpdateDTO.ReservationStart)
+            {
+                return UnprocessableEntity("Reservation end time must be after the start time.");
             }
 
             reservation.GuestName = reservationUpdateDTO.GuestName;
@@ -103,7 +157,18 @@ namespace RestaurantTableReservationSystem.Controllers
             _context.Entry(reservation).State = EntityState.Modified;
 
             await _context.SaveChangesAsync();
-            
+
+            var reservationResponseDTO = new ReservationResponseDTO
+            {
+                ReservationId = reservation.ReservationId,
+                GuestName = reservation.GuestName,
+                GuestPhoneNumber = reservation.GuestPhoneNumber,
+                ReservationStart = reservation.ReservationStart,
+                ReservationEnd = reservation.ReservationEnd,
+                NumberOfGuests = reservation.NumberOfGuests,
+                SpecialRequests = reservation.SpecialRequests
+            };
+
             return NoContent();
         }
 

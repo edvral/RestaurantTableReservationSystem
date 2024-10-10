@@ -65,6 +65,16 @@ namespace RestaurantTableReservationSystem.Controllers
                 return NotFound($"Restaurant with ID {restaurantId} not found.");
             }
 
+            if (tableCreateDTO.Capacity <= 0)
+            {
+                return UnprocessableEntity("Capacity can't be 0 or less.");
+            }
+
+            if (tableCreateDTO.TableNumber < 0)
+            {
+                return UnprocessableEntity("Table number can't be negative.");
+            }
+
             var table = new Table
             {
                 RestaurantId = restaurantId,  
@@ -93,7 +103,17 @@ namespace RestaurantTableReservationSystem.Controllers
             {
                 return NotFound($"Table with ID {id} not found for restaurant with ID {restaurantId}.");
             }
-          
+
+            if (tableUpdateDTO.Capacity <= 0)
+            {
+                return UnprocessableEntity("Capacity can't be 0 or less.");
+            }
+
+            if (tableUpdateDTO.TableNumber < 0)
+            {
+                return UnprocessableEntity("Table number can't be negative.");
+            }
+
             table.TableNumber = tableUpdateDTO.TableNumber;
             table.Capacity = tableUpdateDTO.Capacity;
 

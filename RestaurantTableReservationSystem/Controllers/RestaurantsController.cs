@@ -49,6 +49,12 @@ namespace RestaurantTableReservationSystem.Controllers
         [HttpPost]
         public async Task<ActionResult<Restaurant>> PostRestaurant([FromBody] RestaurantDTO restaurantCreateDTO)
         {
+
+            if (!restaurantCreateDTO.Email.Contains("@"))
+            {
+                return UnprocessableEntity("Email must contain an '@' symbol.");
+            }
+
             var restaurant = new Restaurant
             {
                 Name = restaurantCreateDTO.Name,
@@ -73,6 +79,11 @@ namespace RestaurantTableReservationSystem.Controllers
             if (restaurant == null)
             {
                 return NotFound($"Restaurant with ID {id} not found.");
+            }
+
+            if (!restaurantUpdateDTO.Email.Contains("@"))
+            {
+                return UnprocessableEntity("Email must contain an '@' symbol.");
             }
 
             restaurant.Name = restaurantUpdateDTO.Name;
