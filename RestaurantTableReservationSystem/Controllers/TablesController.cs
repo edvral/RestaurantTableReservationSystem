@@ -65,6 +65,14 @@ namespace RestaurantTableReservationSystem.Controllers
                 return NotFound($"Restaurant with ID {restaurantId} not found.");
             }
 
+            var tableNumberExists = await _context.Tables
+                .AnyAsync(t => t.RestaurantId == restaurantId && t.TableNumber == tableCreateDTO.TableNumber);
+
+            if (tableNumberExists)
+            {
+                return UnprocessableEntity($"Table with number {tableCreateDTO.TableNumber} already exists in this restaurant.");
+            }
+
             if (tableCreateDTO.Capacity <= 0)
             {
                 return UnprocessableEntity("Capacity can't be 0 or less.");
@@ -103,6 +111,15 @@ namespace RestaurantTableReservationSystem.Controllers
             {
                 return NotFound($"Table with ID {id} not found for restaurant with ID {restaurantId}.");
             }
+
+            var tableNumberExists = await _context.Tables
+                 .AnyAsync(t => t.RestaurantId == restaurantId && t.TableNumber == tableUpdateDTO.TableNumber && t.TableId != id);
+
+            if (tableNumberExists)
+            {
+                return UnprocessableEntity($"Another table with number {tableUpdateDTO.TableNumber} already exists in this restaurant.");
+            }
+
 
             if (tableUpdateDTO.Capacity <= 0)
             {
