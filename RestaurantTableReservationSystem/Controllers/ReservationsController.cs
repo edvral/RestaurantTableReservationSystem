@@ -145,6 +145,16 @@ namespace RestaurantTableReservationSystem.Controllers
                 return UnprocessableEntity($"Number of guests cannot exceed the table's capacity of {table.Capacity}.");
             }
 
+            /*var conflictingReservation = await _context.Reservations
+                .Where(r => r.TableId == tableId)
+                .Where(r => r.ReservationStart < reservationUpdateDTO.ReservationEnd && reservationUpdateDTO.ReservationStart < r.ReservationEnd)
+                .FirstOrDefaultAsync();
+
+            if (conflictingReservation != null)
+            {
+                return UnprocessableEntity("A reservation for this table already exists during the specified time.");
+            }*/
+
             DateTime now = DateTime.Now;
 
             if (reservationUpdateDTO.ReservationStart < now)
