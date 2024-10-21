@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using RestaurantTableReservationSystem.Data;
 using RestaurantTableReservationSystem.Models;
 using RestaurantTableReservationSystem.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RestaurantTableReservationSystem.Controllers
 {
@@ -19,6 +20,7 @@ namespace RestaurantTableReservationSystem.Controllers
 
         // GET: api/restaurants/{restaurantId}/tables
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<Table>>> GetTables(int restaurantId)
         {
             var restaurantExists = await _context.Restaurants.AnyAsync(r => r.RestaurantId == restaurantId);
@@ -38,6 +40,7 @@ namespace RestaurantTableReservationSystem.Controllers
 
         // GET: api/restaurants/{restaurantId}/tables/{id}
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<Table>> GetTable(int restaurantId, int id)
         {
             var restaurantExists = await _context.Restaurants.AnyAsync(r => r.RestaurantId == restaurantId);
@@ -57,6 +60,7 @@ namespace RestaurantTableReservationSystem.Controllers
 
         // POST: api/restaurants/{restaurantId}/tables
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Table>> PostTable(int restaurantId, TableDTO tableCreateDTO)
         {
             var restaurantExists = await _context.Restaurants.AnyAsync(r => r.RestaurantId == restaurantId);
@@ -98,6 +102,7 @@ namespace RestaurantTableReservationSystem.Controllers
 
         // PUT: api/restaurants/{restaurantId}/tables/{id}
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutTable(int restaurantId, int id, TableDTO tableUpdateDTO)
         {
             var restaurantExists = await _context.Restaurants.AnyAsync(r => r.RestaurantId == restaurantId);
@@ -143,6 +148,7 @@ namespace RestaurantTableReservationSystem.Controllers
 
         // DELETE: api/restaurants/{restaurantId}/tables/{id}
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteTable(int restaurantId, int id)
         {
             var restaurantExists = await _context.Restaurants.AnyAsync(r => r.RestaurantId == restaurantId);

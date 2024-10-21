@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using RestaurantTableReservationSystem.Data;
 using RestaurantTableReservationSystem.Models;
 using RestaurantTableReservationSystem.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RestaurantTableReservationSystem.Controllers
 {
@@ -19,6 +20,7 @@ namespace RestaurantTableReservationSystem.Controllers
 
         // GET: api/restaurants
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<Restaurant>>> GetRestaurants()
         {
             var restaurants = await _context.Restaurants.ToListAsync();
@@ -33,6 +35,7 @@ namespace RestaurantTableReservationSystem.Controllers
 
         // GET: api/restaurants/{id}
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<Restaurant>> GetRestaurant(int id)
         {
             var restaurant = await _context.Restaurants.FindAsync(id);
@@ -47,6 +50,7 @@ namespace RestaurantTableReservationSystem.Controllers
 
         // POST: api/restaurants
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Restaurant>> PostRestaurant([FromBody] RestaurantDTO restaurantCreateDTO)
         {
 
@@ -81,6 +85,7 @@ namespace RestaurantTableReservationSystem.Controllers
 
         // PUT: api/restaurants/{id}
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutRestaurant(int id, [FromBody] RestaurantDTO restaurantUpdateDTO)
         {
             var restaurant = await _context.Restaurants.FindAsync(id);
@@ -118,6 +123,7 @@ namespace RestaurantTableReservationSystem.Controllers
 
         // DELETE: api/restaurants/{id}
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteRestaurant(int id)
         {
             var restaurant = await _context.Restaurants.FindAsync(id);

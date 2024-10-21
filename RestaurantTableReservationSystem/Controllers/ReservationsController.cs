@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using RestaurantTableReservationSystem.Data;
 using RestaurantTableReservationSystem.Models;
 using RestaurantTableReservationSystem.DTOs;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace RestaurantTableReservationSystem.Controllers
 {
@@ -19,6 +21,7 @@ namespace RestaurantTableReservationSystem.Controllers
 
         // GET: api/tables/{tableId}/reservations
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<Reservation>>> GetReservations(int tableId)
         {           
             var reservations = await _context.Reservations.Where(r => r.TableId == tableId).ToListAsync();
@@ -33,6 +36,7 @@ namespace RestaurantTableReservationSystem.Controllers
 
         // GET: api/tables/{tableId}/reservations/{id}
         [HttpGet("{id}")]
+        [Authorize(Roles = "User,Admin")]
         public async Task<ActionResult<Reservation>> GetReservation(int tableId, int id)
         {
             var tableExists = await _context.Tables.AnyAsync(t => t.TableId == tableId);
@@ -47,11 +51,21 @@ namespace RestaurantTableReservationSystem.Controllers
                 return NotFound($"Reservation with ID {id} not found for table with ID {tableId}.");
             }
 
+            if (User.IsInRole("User"))
+            {
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                if (reservation.UserId != userId)
+                {
+                    return Forbid();
+                }
+            }
+
             return Ok(reservation);
         }
 
         // POST: api/tables/{tableId}/reservations
         [HttpPost]
+        [Authorize(Roles = "User,Admin")]
         public async Task<ActionResult<ReservationResponseDTO>> PostReservation(int tableId, ReservationDTO reservationCreateDTO)
         {
             var table = await _context.Tables.FindAsync(tableId);
@@ -94,6 +108,7 @@ namespace RestaurantTableReservationSystem.Controllers
             var reservation = new Reservation
             {
                 TableId = tableId,
+                UserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)),
                 GuestName = reservationCreateDTO.GuestName,
                 GuestPhoneNumber = reservationCreateDTO.GuestPhoneNumber,
                 ReservationStart = reservationCreateDTO.ReservationStart,
@@ -121,6 +136,7 @@ namespace RestaurantTableReservationSystem.Controllers
 
         // PUT: api/tables/{tableId}/reservations/{id}
         [HttpPut("{id}")]
+        [Authorize(Roles = "User,Admin")]
         public async Task<IActionResult> PutReservation(int tableId, int id, ReservationDTO reservationUpdateDTO)
         {
             var table = await _context.Tables.FindAsync(tableId);
@@ -145,15 +161,16 @@ namespace RestaurantTableReservationSystem.Controllers
                 return UnprocessableEntity($"Number of guests cannot exceed the table's capacity of {table.Capacity}.");
             }
 
-            /*var conflictingReservation = await _context.Reservations
+            var conflictingReservation = await _context.Reservations
                 .Where(r => r.TableId == tableId)
+                .Where(r => r.ReservationId != id)
                 .Where(r => r.ReservationStart < reservationUpdateDTO.ReservationEnd && reservationUpdateDTO.ReservationStart < r.ReservationEnd)
                 .FirstOrDefaultAsync();
 
             if (conflictingReservation != null)
             {
                 return UnprocessableEntity("A reservation for this table already exists during the specified time.");
-            }*/
+            }
 
             DateTime now = DateTime.Now;
 
@@ -165,6 +182,15 @@ namespace RestaurantTableReservationSystem.Controllers
             if (reservationUpdateDTO.ReservationEnd <= reservationUpdateDTO.ReservationStart)
             {
                 return UnprocessableEntity("Reservation end time must be after the start time.");
+            }
+
+            if (User.IsInRole("User"))
+            {
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                if (reservation.UserId != userId)
+                {
+                    return Forbid();
+                }
             }
 
             reservation.GuestName = reservationUpdateDTO.GuestName;
@@ -194,6 +220,7 @@ namespace RestaurantTableReservationSystem.Controllers
 
         // DELETE: api/tables/{tableId}/reservations/{id}
         [HttpDelete("{id}")]
+        [Authorize(Roles = "User,Admin")]
         public async Task<IActionResult> DeleteReservation(int tableId, int id)
         {
             var tableExists = await _context.Tables.AnyAsync(t => t.TableId == tableId);
@@ -206,6 +233,15 @@ namespace RestaurantTableReservationSystem.Controllers
             if (reservation == null)
             {
                 return NotFound($"Reservation with ID {id} not found for table with ID {tableId}.");
+            }
+
+            if (User.IsInRole("User"))
+            {
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                if (reservation.UserId != userId)
+                {
+                    return Forbid();
+                }
             }
 
             _context.Reservations.Remove(reservation);

@@ -4,6 +4,8 @@
     {
         public int ReservationId { get; set; }
         public int TableId { get; set; }
+
+        public int UserId {  get; set; }
         public string GuestName { get; set; }
         public string GuestPhoneNumber { get; set; }
         public DateTime ReservationStart { get; set; }
