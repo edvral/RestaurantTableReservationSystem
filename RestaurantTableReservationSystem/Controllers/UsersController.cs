@@ -98,9 +98,42 @@ namespace RestaurantTableReservationSystem.Controllers
             }
 
             var token = GenerateJwtToken(user);
-            return Ok(new { token, expiration = DateTime.Now.AddHours(1) });
+            var refreshToken = GenerateRefreshToken();
+            SaveRefreshToken(user.UserId, refreshToken);  
+
+            return Ok(new { token, expiration = DateTime.Now.AddHours(1), refreshToken });
         }
-        
+
+        [AllowAnonymous]
+        [HttpPost("refresh")]
+        public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
+        {
+            var storedToken = await _context.RefreshTokens
+                .FirstOrDefaultAsync(rt => rt.Token == refreshToken && !rt.Revoked);
+
+            if (storedToken == null || storedToken.Expires < DateTime.UtcNow)
+            {
+                return Unauthorized("Invalid or expired refresh token.");
+            }
+
+            storedToken.Revoked = true;
+
+            var user = await _context.Users.FindAsync(storedToken.UserId);
+            var newAccessToken = GenerateJwtToken(user);
+            var newRefreshToken = GenerateRefreshToken();
+
+            var newTokenEntry = new RefreshToken
+            {
+                Token = newRefreshToken,
+                UserId = user.UserId,
+                Expires = DateTime.UtcNow.AddDays(7),
+            };
+            _context.RefreshTokens.Add(newTokenEntry);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { token = newAccessToken, refreshToken = newRefreshToken });
+        }
+
         private string GenerateJwtToken(User user)
         {
             var claims = new[]
@@ -121,6 +154,30 @@ namespace RestaurantTableReservationSystem.Controllers
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                return Convert.ToBase64String(randomNumber);
+            }
+        }
+
+        private void SaveRefreshToken(int userId, string refreshToken)
+        {
+            var tokenEntry = new RefreshToken
+            {
+                Token = refreshToken,
+                UserId = userId,
+                Expires = DateTime.UtcNow.AddDays(7),
+                Created = DateTime.UtcNow,
+            };
+
+            _context.RefreshTokens.Add(tokenEntry);
+            _context.SaveChanges();
         }
     }
 }
