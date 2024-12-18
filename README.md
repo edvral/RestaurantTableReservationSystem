@@ -40,3 +40,6 @@
    - **Frontend**: Vue.js
    - **Database**: MySQL
    - **Cloud**: Microsoft Azure
+   - **Wireframes** : Figma
+   
+Galutinė projekto ataskaita : [Edvinas_Ralys_IFF_1_8 ProjektoAtaskaita.pdf](https://github.com/user-attachments/files/18085843/Edvinas_Ralys_IFF_1_8.ProjektoAtaskaita.pdf)
