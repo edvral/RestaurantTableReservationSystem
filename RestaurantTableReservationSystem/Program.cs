@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RestaurantTableReservationSystem.Data;
+using RestaurantTableReservationSystem.Services;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -46,6 +47,18 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Restaurant Reservation API", Version = "v1" });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.WithOrigins("http://localhost:8080")
+               .AllowAnyHeader()
+               .AllowAnyMethod();
+    });
+});
+
+builder.Services.AddHostedService<ReservationCleanupService>();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -54,6 +67,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Restaurant Reservation API v1"));
 }
 
+app.UseCors();
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

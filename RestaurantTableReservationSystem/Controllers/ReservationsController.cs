@@ -53,7 +53,7 @@ namespace RestaurantTableReservationSystem.Controllers
 
             if (User.IsInRole("User"))
             {
-                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                var userId = int.Parse(User.FindFirstValue("userId"));
                 if (reservation.UserId != userId)
                 {
                     return Forbid();
@@ -108,7 +108,7 @@ namespace RestaurantTableReservationSystem.Controllers
             var reservation = new Reservation
             {
                 TableId = tableId,
-                UserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)),
+                UserId = int.Parse(User.FindFirstValue("userId")),
                 GuestName = reservationCreateDTO.GuestName,
                 GuestPhoneNumber = reservationCreateDTO.GuestPhoneNumber,
                 ReservationStart = reservationCreateDTO.ReservationStart,
@@ -186,7 +186,7 @@ namespace RestaurantTableReservationSystem.Controllers
 
             if (User.IsInRole("User"))
             {
-                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                var userId = int.Parse(User.FindFirstValue("userId"));
                 if (reservation.UserId != userId)
                 {
                     return Forbid();
@@ -237,7 +237,7 @@ namespace RestaurantTableReservationSystem.Controllers
 
             if (User.IsInRole("User"))
             {
-                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                var userId = int.Parse(User.FindFirstValue("userId"));
                 if (reservation.UserId != userId)
                 {
                     return Forbid();

@@ -99,14 +99,6 @@ namespace RestaurantTableReservationSystem.Controllers
                 return UnprocessableEntity("Email must contain an '@' symbol.");
             }
 
-            var restaurantExists = await _context.Restaurants
-                .AnyAsync(r => r.Name == restaurantUpdateDTO.Name && r.Location == restaurantUpdateDTO.Location);
-
-            if (restaurantExists)
-            {
-                return UnprocessableEntity($"A restaurant with the name '{restaurantUpdateDTO.Name}' already exists at location '{restaurantUpdateDTO.Location}'.");
-            }
-
             restaurant.Name = restaurantUpdateDTO.Name;
             restaurant.Location = restaurantUpdateDTO.Location;
             restaurant.PhoneNumber = restaurantUpdateDTO.PhoneNumber;

@@ -104,6 +104,27 @@ namespace RestaurantTableReservationSystem.Controllers
             return Ok(new { token, expiration = DateTime.Now.AddHours(1), refreshToken });
         }
 
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromBody] string refreshToken)
+        {
+            var storedToken = await _context.RefreshTokens
+                .FirstOrDefaultAsync(rt => rt.Token == refreshToken);
+
+            if (storedToken == null || storedToken.Revoked)
+            {
+                return BadRequest("Invalid refresh token.");
+            }
+
+            storedToken.Revoked = true;
+
+            _context.RefreshTokens.Update(storedToken);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "User logged out successfully." });
+        }
+
+
         [AllowAnonymous]
         [HttpPost("refresh")]
         public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
@@ -138,7 +159,7 @@ namespace RestaurantTableReservationSystem.Controllers
         {
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+                new Claim("userId", user.UserId.ToString()),
                 new Claim(ClaimTypes.Role, user.Role)
             };
 
