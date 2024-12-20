@@ -42,4 +42,4 @@
    - **Cloud**: Microsoft Azure
    - **Wireframes** : Figma
    
-Galutinė projekto ataskaita : [Edvinas_Ralys_IFF_1_8 ProjektoAtaskaita.pdf](https://github.com/user-attachments/files/18085843/Edvinas_Ralys_IFF_1_8.ProjektoAtaskaita.pdf)
+Galutinė projekto ataskaita : [Edvinas_Ralys_IFF_1_8 ProjektoAtaskaita.pdf](https://github.com/user-attachments/files/18212508/Edvinas_Ralys_IFF_1_8.ProjektoAtaskaita.pdf)
